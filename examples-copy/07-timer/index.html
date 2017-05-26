@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>study: timer</title>
+</head>
+<body>
+<div id="app"></div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="woowahan.js"></script>
+<script>
+  const HelloView = Woowahan.View.create('HelloView', {
+    template: Handlebars.compile(`
+        <h1>{{title}}</h1>
+        <button class="btn" data-role="bind" data-name="btnTitle">{{btnTitle}}</button>
+        <h2><time data-role="bind" data-name="time">{{time}}</time></h2>
+    `),
+
+    events: {
+      'click .btn': 'onTimerToggle'
+    },
+
+    initialize() {
+      this.setModel({
+        title: 'hello',
+        btnTitle: 'start',
+        time: 0
+      })
+
+      this.super()
+    },
+
+
+    viewWillUnmount() {
+      this.timer && clearInterval(this.timer);
+    },
+
+    onTimerToggle() {
+      console.log('onTimerToggle', this.getModel('btnTitle'))
+      this.getModel('btnTitle') === 'start' ? this.startTimer() : this.stopTimer()
+    },
+
+    startTimer() {
+      this.timer = setInterval(() => {
+        const num = parseFloat(this.getModel('time')) + 0.1
+        this.setModel({time: num.toFixed(1)})
+      }, 100)
+
+      console.log('startTimer()', this.timer)
+      this.setModel({btnTitle: 'stop'})
+    },
+
+    stopTimer() {
+      this.timer && clearInterval(this.timer)
+      this.setModel({btnTitle: 'start'})
+    }
+  })
+
+  const app = new Woowahan()
+  app.start({
+    url: '/',
+    container: '#app',
+    view: HelloView
+  })
+</script>
+</body>
+</html>
